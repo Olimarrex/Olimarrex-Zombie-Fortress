@@ -138,15 +138,21 @@ shared int canZombify(bool willing)
 {
 	CRules@ rules = getRules();
 	int playerCount = getPlayersCount();
-	ZombiesCore@ core;
-	getRules().get("core", @core);
-	int zombieCount = core.teams[1].players_count; //ZOMBIE TEAM PLAYER COUNT.
-	int zombieRation = ( (zombieCount * 3.0f) + 4 );
+	int zombieCount = 0;
+	for(int i = 0; i < playerCount; i++)
+	{
+		CPlayer@ p = getPlayer(i);
+		if(p !is null && p.getTeamNum() == 1)
+		{
+			zombieCount++;
+		}
+	}
+	int zombieRation = ( (zombieCount * 3.0f) + 5 );
 	if(!(playerCount - zombieRation > 0) || !willing)
 	{
 		return zombifyStatus::playerCount;
 	}
-	else if(getDaysSurvived() < 5)
+	else if(getDaysSurvived() < 5 )
 	{
 		return zombifyStatus::time;
 	}
