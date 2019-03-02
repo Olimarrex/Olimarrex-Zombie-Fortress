@@ -1,9 +1,10 @@
 //ZombieCommon.as
+#include "zombies_Rules.as";
 shared int getDaysSurvived()
 {
 	CRules@ rules = getRules();
 	int gamestart = rules.get_s32("gamestart");
-	int day_cycle = rules.daycycle_speed * 60;			
+	f32 day_cycle = rules.daycycle_speed * 60.0f;
 	int dayNumber = ((getGameTime() - gamestart) / getTicksASecond() / day_cycle) + 1;
 	return  dayNumber;
 }
@@ -67,7 +68,7 @@ shared class waveInfo
 shared waveInfo[] initWaveInfos()
 {
 	waveInfo[] infos = {
-	//			Name, 		chance, min  wave, max wave, p wave specific zombie
+	//			Name, 		 chance,  minwave, maxwave, p wave specific zombie
 		waveInfo("zchicken",		70, 	0, 	7,	false),
 		waveInfo("catto",			50, 	1, 	15,	false),
 		waveInfo("skeleton", 		40, 	3, 	18,	false),
@@ -75,20 +76,20 @@ shared waveInfo[] initWaveInfos()
 		waveInfo("zombie", 			60, 	6,	30,	false),
 		waveInfo("zbison", 			20, 	6, 	60,	false), //TODO: make these bois WAY more strong.
 		waveInfo("landwraith", 		10, 	7, 	-1,	false),
-		waveInfo("greg", 			12, 	7, 	-1,	false),
-		waveInfo("zombieknight",	20, 	7, 	-1,	false),
-		waveInfo("wraith", 			10, 	8,	-1,	false),
-		waveInfo("zombieknight",	40, 	14,	-1,	false),
+		waveInfo("greg", 			10, 	9, 	-1,	false),
+		waveInfo("wraith", 			5, 		8,	-1,	false),
+		waveInfo("zombieknight",	20, 	10, -1,	false),
+		waveInfo("zombieknight",	40, 	18,	-1,	false),
 		
 		//Zombies that spawn on the major waves (pZombies)
-		waveInfo("pankou", 			15,		0, 	-1,	true),
-		waveInfo("pbrute", 			10,		10,	-1,	true),
-		waveInfo("pgreg", 			7,		10,	-1,	true),
-		waveInfo("horror", 			10,		10, -1,	true),
-		waveInfo("phellknight", 	5,		10, -1,	true),
-		waveInfo("pbanshee", 		5,		15, -1,	true),
-		waveInfo("abomination", 	2, 		15,	-1,	true),
-		waveInfo("abomination", 	20,		30,	-1,	true)
+		waveInfo("pankou", 			15,		4,	-1,	true),
+		waveInfo("pbrute", 			10,		4,	-1,	true),
+		waveInfo("pgreg", 			7,		9,	-1,	true),
+		waveInfo("horror", 			10,		14,	-1,	true),
+		waveInfo("phellknight", 	5,		14,	-1,	true),
+		waveInfo("pbanshee", 		5,		19, -1,	true),
+		waveInfo("abomination", 	2, 		24,	-1,	true),
+		waveInfo("abomination", 	20,		34,	-1,	true)
 	};
 	return infos;
 }
@@ -108,8 +109,7 @@ shared string[] selectStringsToSpawn(int wave, bool isPWave, int number, waveInf
 				totalWeight += info.weight;
 			}
 		}
-	}
-
+	}	
 	
 	string[] blobs;
 	for(int i = 0; i < number; i++)
@@ -127,7 +127,6 @@ shared string[] selectStringsToSpawn(int wave, bool isPWave, int number, waveInf
 			}
 		}
 	}
-
 	return blobs;
 }
 
@@ -135,3 +134,49 @@ shared int getOtherTeam(int curTeam)
 {
 	return Maths::Abs(curTeam - 2);
 }
+shared int canZombify(bool willing)
+{
+	CRules@ rules = getRules();
+	int playerCount = getPlayersCount();
+	ZombiesCore@ core;
+	getRules().get("core", @core);
+	int zombieCount = core.teams[1].players_count; //ZOMBIE TEAM PLAYER COUNT.
+	int zombieRation = ( (zombieCount * 3.0f) + 4 );
+	if(!(playerCount - zombieRation > 0) || !willing)
+	{
+		return zombifyStatus::playerCount;
+	}
+	else if(getDaysSurvived() < 5)
+	{
+		return zombifyStatus::time;
+	}
+	else
+	{
+		return zombifyStatus::allowed;
+	}
+}
+string[] zombifyString = {
+	"Bury Yourself",
+	"Don't abandon your small team!",
+	"It's too soon to bury yourself!"
+};
+namespace zombifyStatus 
+{
+	shared enum status
+	{
+		allowed = 0,
+		playerCount,
+		time
+	};
+}
+
+
+
+
+
+
+
+
+
+
+//Greh

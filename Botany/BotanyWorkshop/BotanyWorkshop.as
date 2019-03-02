@@ -17,13 +17,18 @@ void onInit(CBlob@ this)
 	
 	// SHOP
 	this.set_Vec2f("shop offset", Vec2f(0, 3));
-	this.set_Vec2f("shop menu size", Vec2f(1, 1)); 
+	this.set_Vec2f("shop menu size", Vec2f(2, 1)); 
 	this.set_string("shop description", "Do things with plants");
 	this.set_u8("shop icon", 25);
 	
 	{
 		ShopItem@ s = addShopItem(this, "Coin", "$COIN$", "coin-10", "Sell tea leaves for money.");
 		AddRequirement(s.requirements, "blob", "tealeaf", "Tea Leaf", 1);
+		s.spawnNothing = true;
+	}
+	{
+		ShopItem@ s = addShopItem(this, "Coin", "$COIN$", "coin-5", "Sell botany seeds for money.");
+		AddRequirement(s.requirements, "blob", "botanyseed", "Seeds", 1);
 		s.spawnNothing = true;
 	}
 }

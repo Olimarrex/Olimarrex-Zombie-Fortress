@@ -3,6 +3,7 @@ void onInit(CBlob@ this)
 {
 	this.Tag("poisonable");
 	this.set_u16("poison magnitude", 0);
+	this.set_u16("poison record", 0);
 	this.getCurrentScript().tickFrequency = 60;
 	this.getCurrentScript().removeIfTag = "dead";
 	this.set_f32("poisonRes", 1.0f);
@@ -40,4 +41,29 @@ void onTick(CBlob@ this)
 			}
 		}
 	}
+}
+
+int poisonWidth = 100;
+
+void onRender( CSprite@ this )
+{
+	if (g_videorecording)
+		return;
+	CBlob@ blob = this.getBlob();
+	u16 poisonRecord = blob.get_u16("poison record");
+	if(poisonRecord == 0)
+		return;
+		
+	float percent = getPoisonLevel(blob) / float(poisonRecord);
+	 
+	Vec2f center = blob.getScreenPos();
+	Vec2f upperleft = center;
+	upperleft.x -= poisonWidth / 2.0f;
+	upperleft.y += 15;
+	Vec2f lowerright = upperleft;
+	lowerright.x += poisonWidth;
+	lowerright.y += 15;
+	GUI::DrawProgressBar(upperleft, lowerright, percent);
+	
+	GUI::DrawIcon( "PoisonBubble.png", 1, Vec2f(16, 16), upperleft - Vec2f(25, 25), 1.5f);
 }

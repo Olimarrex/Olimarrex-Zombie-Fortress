@@ -7,8 +7,8 @@ void onInit( CBlob@ this )
 	this.getSprite().getConsts().accurateLighting = true;
 	this.Tag("building");
 
-	this.SetLight(true);
-	this.SetLightRadius( 30.0f );
+	// this.SetLight(true);
+	// this.SetLightRadius( 30.0f );
 }
 		
 

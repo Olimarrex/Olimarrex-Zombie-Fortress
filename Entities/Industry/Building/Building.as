@@ -99,7 +99,6 @@ void onInit( CBlob@ this )
 		AddRequirement(s.requirements, "blob", "mat_stone", "Stone", CTFCosts::quarry_stone);
 		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", CTFCosts::quarry_gold);
 	}
-	print("G " + CTFCosts::quarry_stone);
 }
 
 void GetButtonsFor( CBlob@ this, CBlob@ caller )

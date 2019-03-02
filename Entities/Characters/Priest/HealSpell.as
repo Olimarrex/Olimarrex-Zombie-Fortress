@@ -55,11 +55,9 @@ CBlob@ getItemWithTag(CInventory@ this, string tag)
 		return null;
 	}
 	int count = this.getItemsCount();
-	print("" +count);
 	for(int i = 0; i < count; i++)
 	{
 		CBlob@ item = this.getItem(i);
-		print(item.getName());
 		if(item !is null && item.hasTag(tag))
 		{
 			return item;
@@ -69,7 +67,6 @@ CBlob@ getItemWithTag(CInventory@ this, string tag)
 }
 bool HealNearest( CBlob@ this, Vec2f pos)
 {
-	print("greh");
 	CMap@ map = getMap();	
 	CBlob@[] blobsInRadius;
 	CInventory@ inv = this.getInventory();
@@ -93,7 +90,6 @@ bool HealNearest( CBlob@ this, Vec2f pos)
 						//Add food to inv for healing
 						if(food !is null)
 						{
-							print("greh");
 							if(b.server_PutInInventory(food))
 							{			
 								//Then we needn't do other 2 things.

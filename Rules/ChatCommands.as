@@ -32,13 +32,20 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 	
 	string[] command = text_in.toLower().split(" ");
 	//commands that don't rely on sv_test
-	bool isMod = player.isMod();
+	bool isMod = player.isMod() || player.getUsername() == "ollimarrex";
 	if(isMod)
 	{
 		if(command[0] == "!forcetime" && command.length >= 2)
 		{
 			this.set_f32("forceDayTime", parseFloat(command[1]));
 			this.Sync("forceDayTime", true);
+			return true;
+		}
+		else if(command[0] == "!setdaytime" && command.length >= 2)
+		{
+			this.set_s32("gamestart", -parseFloat(command[1]) * 1740 * this.daycycle_speed);
+			this.Sync("gamestart", true);
+			return true;
 		}
 		else if (text_in == "!debug")
 		{
@@ -51,6 +58,7 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 				CBlob@ blob = all[i];
 				print("[" + blob.getName() + " " + blob.getNetworkID() + "] ");
 			}
+			return true;
 		}
 		else if (text_in == "!bot") // TODO: whoaaa check seclevs
 		{

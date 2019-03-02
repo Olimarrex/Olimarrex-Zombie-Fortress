@@ -75,9 +75,9 @@ void onTick(CBlob@ this)
 	}
 	
 	u32 healTime = getGameTime() - this.get_u32("healStartedTime");
-	if(healTime > 160)
+	if(healTime > 130)
 	{
-		if(healTime % 60 == 0)
+		if(healTime % 50 == 0)
 		{
 			if(this.getHealth() < this.getInitialHealth())
 			{
@@ -88,7 +88,7 @@ void onTick(CBlob@ this)
 	}
 	//frame = Maths::Min((healTime / 120.0f) * 10.0f, 10);
 	
-	if(this.isKeyJustReleased(key_action1))
+	if(this.isKeyJustReleased(key_action1) && !this.isKeyJustReleased(key_action2) && !this.isKeyPressed(key_action2))
 	{
 		if(getNet().isServer() && shootTime > 0)
 		{

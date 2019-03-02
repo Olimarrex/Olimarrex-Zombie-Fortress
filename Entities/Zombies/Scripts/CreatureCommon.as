@@ -37,9 +37,9 @@ shared class TargetInfo
         seeThroughWalls = _seeThroughWalls;
     }
 
-    bool isTarget( CBlob@ target )
+    bool isTarget( CBlob@ target, CBlob@ this )
     {
-        return tag ? target.hasTag(identifier) : target.getName() == identifier;
+        return  target.getTeamNum() != this.getTeamNum() && (tag ? target.hasTag(identifier) : target.getName() == identifier);
     }
 }
 
@@ -101,7 +101,7 @@ bool isTarget( CBlob@ this, CBlob@ target )
         {
             TargetInfo info = infos[i];
 
-            if (info.isTarget(target))
+            if (info.isTarget(target, this))
             {
                 return true;
             }
@@ -121,7 +121,7 @@ f32 getTargetPriority( CBlob@ this, CBlob@ target )
         {
             TargetInfo info = infos[i];
 
-            if (info.isTarget(target))
+            if (info.isTarget(target, this))
             {
                 return info.priority;
             }
@@ -141,7 +141,7 @@ bool seeTargetThroughWalls( CBlob@ this, CBlob@ target )
         {
             TargetInfo info = infos[i];
 
-            if (info.isTarget(target))
+            if (info.isTarget(target, this))
             {
                 return info.seeThroughWalls;
             }
@@ -222,7 +222,7 @@ void addIndustryTargets(TargetInfo[] @infos)
 		infos.push_back(i);		
 	}
 	{
-		TargetInfo i("survivorbuilding", 0.6f, true);
+		TargetInfo i("building", 0.6f, true);
 		infos.push_back(i);
 	}
 	{

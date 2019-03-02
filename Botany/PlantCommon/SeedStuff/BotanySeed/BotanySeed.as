@@ -5,23 +5,45 @@ void onInit(CBlob@ this)
 	this.getCurrentScript().tickFrequency = 50; //Meh.
 	this.setInventoryName(this.exists("seedname") ? this.get_string("seedname") : "seed");
 	initSeed(this);
+	this.set_u32("groundTime", 0);
 }
 void onTick(CBlob@ this) //Making crop.
 {
 	if(getNet().isServer() && this.getTickSinceCreated() > 150)
 	{
 		string crop = getBlobName(this);
-		if(crop != "" && canGrow(this))
+		if(canGrow(this))
 		{
-			CBlob@ b = server_CreateBlobNoInit(crop);
-			if(b !is null)
+			this.set_u32("groundTime", 0);
+			this.set_u32("timeOnGround", 0);
+			if(crop != "")
 			{
-				b.setPosition(this.getPosition());
-				b.server_setTeamNum(this.getTeamNum());
-				b.Init();
-				copyMutation(this, b, false);
+				CBlob@ b = server_CreateBlobNoInit(crop);
+				if(b !is null)
+				{
+					b.setPosition(this.getPosition());
+					b.server_setTeamNum(this.getTeamNum());
+					b.Init();
+					copyMutation(this, b, false);
+				}
+				this.server_Die();
 			}
-			this.server_Die();
+		}
+		else if(!this.isInInventory() && this.isOnGround() || this.getShape().isStatic())
+		{
+			u32 groundTime = this.get_u32("groundTime");
+			if(groundTime != 0)
+			{
+				if(getGameTime() - groundTime > 1800) //30 seconds
+				{
+					this.server_Die();
+				}
+			}
+			else
+			{
+				this.set_u32("groundTime", getGameTime());
+			}
+			
 		}
 	}
 }

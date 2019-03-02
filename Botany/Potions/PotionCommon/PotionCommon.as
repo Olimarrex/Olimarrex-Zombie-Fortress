@@ -213,7 +213,7 @@ potionInfo[] potions =
 	potionInfo("", "Mundane Water", "nothing", potionTypes::remedy),
 	potionInfo("RegenerationBrew.as", "Brew of Regeneration", "regenerate", potionTypes::brew, null, null, 600),
 	potionInfo("ToxicPoison.as", "Blade Poison of Foul Play", "toxic", potionTypes::poison, null, null, 200),
-	potionInfo("", "Brew of Poison Resistance", "poisonres", potionTypes::brew, @poisonResStart, @poisonResEnd, 1200),
+	potionInfo("", "Brew of Poison Resistance", "poisonres", potionTypes::brew, @poisonResStart, @poisonResEnd, 1500),
 	potionInfo("", "Elixir of Night Vision", "nightvis", potionTypes::elixir, @nightVisStart, @nightVisEnd, 700),
 	potionInfo("SpitSeedsElixir.as", "Seed Spitter's Elixir", "spitseeds", potionTypes::elixir, null, null, 300),
 	potionInfo("AntiGravityPoison.as", "Blade Poison of AntiGravity", "antigravity", potionTypes::poison, null, null, 200),

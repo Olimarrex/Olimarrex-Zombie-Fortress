@@ -12,14 +12,12 @@
 void poisonResStart( CBlob@ this, f32 strength )
 {
 	f32 poisonRes = this.get_f32("poisonRes");
-	print("Poison Res: "+ poisonRes + " strength: " + strength);
 	this.set_f32("poisonRes", poisonRes * (strength * 2));
 }
 
 void poisonResEnd( CBlob@ this, f32 strength )
 {
 	f32 poisonRes = this.get_f32("poisonRes");
-	print("Poison Res: "+ poisonRes);
 	this.set_f32("poisonRes", poisonRes / (strength * 2));
 }
 

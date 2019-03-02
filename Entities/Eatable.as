@@ -72,7 +72,7 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 
 bool isEdible(CBlob@ this, CBlob@ eater)
 {
-	return true;
+	return getNet().isServer() && eater.hasTag("player") && !this.hasTag("healed");
 }
 
 void onCollision(CBlob@ this, CBlob@ blob, bool solid)

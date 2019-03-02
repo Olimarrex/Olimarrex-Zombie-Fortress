@@ -1,8 +1,3 @@
-
-//Zombies gamemode logic script
-//Modded by Eanmig (Edited by Frikman)
-#define SERVER_ONLY
-
 #include "CTF_Structs.as";
 #include "RulesCore.as";
 #include "RespawnSystem.as";
@@ -390,7 +385,7 @@ shared class ZombiesSpawns : RespawnSystem
 			tickspawndelay = 160;
 			if(info.team == 1 && !isNightTime()) //Less power for zombos during day.
 			{
-				tickspawndelay *= 5;
+				tickspawndelay *= 4;
 			}
 		}
 		
@@ -445,7 +440,7 @@ shared class ZombiesCore : RulesCore
     s32 warmUpTime;
     s32 gameDuration;
     s32 spawnTime;
-	s32 nightStage = 0;	
+	s32 timeStage = 0;	
 
     ZombiesSpawns@ Zombies_spawns;
 
@@ -500,14 +495,14 @@ shared class ZombiesCore : RulesCore
 		}
 		else { difficulty = 1.0; } //default actdiff>9
 		
-		if (rules.isWarmup() && (timeElapsed>getTicksASecond()*60) || (sv_test  && timeElapsed>getTicksASecond()*5) )
+		if (rules.isWarmup() && (timeElapsed > getTicksASecond()*60) || (sv_test && timeElapsed>getTicksASecond()*5) )
 		{
 			rules.SetCurrentState(GAME);
 		}
 		rules.set_f32("difficulty",difficulty / 3.2); //default 3.0
 		int intdif = difficulty;
 		if (intdif<=0) intdif=1;
-		int spawnRate = getTicksASecond() * (7 - (difficulty / 6.0f) );
+		int spawnRate = Maths::Max(getTicksASecond() * (7 - (difficulty / 6.0f) ), 1);
 		
 		if (getGameTime() % 200 == 0)
 		{
@@ -516,7 +511,7 @@ shared class ZombiesCore : RulesCore
 			num_zombies = zombie_blobs.length;
 			rules.set_s32("num_zombies",num_zombies);
 		}
-	    if (getGameTime() % (spawnRate) == 0 && num_zombies < max_zombies)
+	    if (getGameTime() % (spawnRate) == 0)
         {
 			
 			CMap@ map = getMap();
@@ -526,75 +521,104 @@ shared class ZombiesCore : RulesCore
 				rules.SetGlobalMessage("Day " + dayNumber);		
 				
 				//getMap().getMarkers("zombie spawn", zombiePlaces );
-				
+				bool nightTime = isNightTime();
+				if(num_zombies < max_zombies)
 				{
-					u32 x = 32;
-					Vec2f left;
-					if(!getMap().rayCastSolid( Vec2f(x, 0.0f), Vec2f(x, map.tilemapheight * map.tilesize), left ))
 					{
-						left = Vec2f(x, 0);
-					}
-					else
-					{
-						left.y -= 20;
-					}
-					zombiePlaces.push_back(left);
-					
-					Vec2f right;
-					x = (map.tilemapwidth * map.tilesize) - 32;
-					if(!getMap().rayCastSolid( Vec2f(x, 0.0f), Vec2f(x, map.tilemapheight * map.tilesize), right ))
-					{
-						right = Vec2f(x, 0);
-					}
-					else
-					{
-						right.y -= 20;
-					}
-					zombiePlaces.push_back(right);
-				}
-				
-				if (isNightTime())
-                {
-					
-					string[] stringInfos = selectStringsToSpawn(dayNumber, false, 2, waveInfos);
-					
-					for(int i = 0; i < zombiePlaces.length; i++)
-					{
-						Vec2f sp = zombiePlaces[i];
-						string[] stringInfos;
-						//start of night
-						if(nightStage == 0)
+						u32 x = 32;
+						Vec2f left;
+						if(!getMap().rayCastSolid( Vec2f(x, 0.0f), Vec2f(x, map.tilemapheight * map.tilesize), left ))
 						{
-							if (dayNumber % 5 == 0)
-							{
-								stringInfos = selectStringsToSpawn(dayNumber, true, Maths::Sqrt(dayNumber) * 7, waveInfos);
-							}
-							nightStage = 1;
+							left = Vec2f(x, 0);
 						}
 						else
 						{
-							stringInfos = selectStringsToSpawn(dayNumber, false, 1, waveInfos);
+							left.y -= 20;
 						}
+						zombiePlaces.push_back(left);
 						
-						for(int i = 0; i < stringInfos.length; i++)
+						Vec2f right;
+						x = (map.tilemapwidth * map.tilesize) - 32;
+						if(!getMap().rayCastSolid( Vec2f(x, 0.0f), Vec2f(x, map.tilemapheight * map.tilesize), right ))
 						{
-							server_CreateBlob(stringInfos[i], 1, sp);
+							right = Vec2f(x, 0);
+						}
+						else
+						{
+							right.y -= 20;
+						}
+						zombiePlaces.push_back(right);
+					}
+					if (nightTime)
+					{
+						
+						string[] stringInfos = selectStringsToSpawn(dayNumber, false, 2, waveInfos);
+						
+						for(int i = 0; i < zombiePlaces.length; i++)
+						{
+							Vec2f sp = zombiePlaces[i];
+							string[] stringInfos;
+							//start of night
+							if(timeStage == 1)
+							{
+								if (dayNumber % 5 == 0)
+								{
+									stringInfos = selectStringsToSpawn(dayNumber, true, Maths::Sqrt(dayNumber) * 6, waveInfos);
+								}
+							}
+							else
+							{
+								stringInfos = selectStringsToSpawn(dayNumber, false, 1, waveInfos);
+							}
+							
+							for(int i = 0; i < stringInfos.length; i++)
+							{
+								server_CreateBlob(stringInfos[i], 1, sp);
+							}
 						}
 					}
 				}
-				else if(nightStage == 1)
+				//timeStage management.
+				if(nightTime) //Night start
 				{
-					nightStage = 0;
-					print("NRYU");
+					if(timeStage == 0) //Night init
+					{
+						timeStage = 1;
+					}
+					else if(timeStage == 1) //Constant night
+					{
+						timeStage = 2;
+					}
+				}
+				else
+				{
+					if(timeStage == 2) //Day start
+					{
+						timeStage = 3;
+						if(dayNumber % 10 == 0)
+						{
+							string gradientName = gradientNames[Maths::Min(Maths::Floor(dayNumber / (10.0f + 1)), gradientNames.length - 1)];
+							map.CreateSkyGradient( gradientName );
+						}
+					}
+					else if(timeStage == 3) //Constant day
+					{
+						timeStage = 0;
+					}
 				}
 			}
 		}
+
 		
         RulesCore::Update(); //update respawns
         CheckTeamWon();
 
     }
-
+	string[] gradientNames = {
+		"skygradient.png",
+		"darkergradient.png",
+		"darkerergradient.png"
+	};
     //team stuff
 
     void AddTeam(CTeam@ team)
@@ -727,7 +751,7 @@ shared class ZombiesCore : RulesCore
 			{
 				addKill(killer.getTeamNum());
 				Zombify ( victim );
-				if(!killer.hasTag("willingZombie") && victim.getTeamNum() != 0)
+				if(!killer.hasTag("willingZombie") && victim.getTeamNum() != 1)
 				{
 					u8 humanKills = killer.get_u8("humanKills");
 					humanKills++;
@@ -883,15 +907,6 @@ void spawnGraves(Vec2f pos)
 	}
 }
 
-void onInit(CRules@ this)
-{
-	Reset(this);
-}
-
-void onRestart(CRules@ this)
-{
-	Reset(this);
-}
 
 void Reset(CRules@ this)
 {

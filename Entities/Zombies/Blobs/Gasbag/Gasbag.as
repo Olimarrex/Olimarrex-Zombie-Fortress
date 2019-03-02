@@ -3,7 +3,7 @@
 #include "CreatureCommon.as";
 
 const u8 ATTACK_FREQUENCY = 60; // 30 = 1 second
-const f32 ATTACK_DAMAGE = 0.3f;
+const f32 ATTACK_DAMAGE = 0.5f;
 const f32 ATTACK_DISTANCE = 1.0f;
 
 const int COINS_ON_DEATH = 10;

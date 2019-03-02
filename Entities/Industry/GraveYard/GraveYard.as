@@ -1,4 +1,5 @@
 ﻿#include "MaterialCommon.as";
+#include "ZombieCommon.as";
 void onInit(CBlob@ this)
 {
 	this.addCommandID("Zombify");
@@ -8,9 +9,13 @@ void GetButtonsFor(CBlob@ this, CBlob@ caller)
 {
 	if(caller.getTeamNum() == this.getTeamNum() && caller.isOverlapping(this))
 	{
+		int status = canZombify(true);
+		string desc = zombifyString[status];
+		
 		CBitStream params;
 		params.write_u16(caller.getNetworkID());
-		caller.CreateGenericButton("$Succumb$", Vec2f_zero, this, this.getCommandID("Zombify"), "Bury yourself", params);
+		CButton@ button = caller.CreateGenericButton("$Succumb$", Vec2f_zero, this, this.getCommandID("Zombify"), desc, params);
+		button.SetEnabled(status <= zombifyStatus::allowed);
 	}
 }
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params)

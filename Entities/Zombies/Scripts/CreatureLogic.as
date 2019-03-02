@@ -25,5 +25,5 @@ void onTick( CBlob@ this )
 
 bool canBePickedUp(CBlob@ this, CBlob@ byBlob)
 {
-    return this.hasTag("dead");
+    return this.getMass() < byBlob.getMass() * 1.25f && byBlob.getTeamNum() == this.getTeamNum();
 }

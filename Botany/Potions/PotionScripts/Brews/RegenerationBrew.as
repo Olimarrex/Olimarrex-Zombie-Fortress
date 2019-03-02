@@ -3,6 +3,15 @@
 #include "PotionCommon.as";
 void onTick (CBlob@ this)
 {
-	f32 strength = getPotionStrength(this, potionIndex::regenerate);
-	this.server_Heal(strength / 300.0f);
+	if(getNet().isServer())
+	{
+		if(getGameTime() % 20 == 0)
+		{
+			f32 strength = getPotionStrength(this, potionIndex::regenerate);
+			float amount = strength / 50.0f;
+			print("Strength: " + strength);
+			print("number: " + amount);
+			this.server_Heal(amount);
+		}
+	}
 }
